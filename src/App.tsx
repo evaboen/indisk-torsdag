@@ -5,8 +5,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-       indisk torsdag
-
+       indisk torsdag.
       </header>
     </div>
   );
