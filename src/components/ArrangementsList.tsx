@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import {  fetchData, IArrangement } from "../firebase/dbUtils";
 import { Arrangement } from "./ Arrangement";
 import styled from 'styled-components';
+import { UserCredential } from "firebase/auth";
 
-
-export default function ArrangementsList() {
+interface IProps {
+  user: UserCredential
+}
+export default function ArrangementsList(props: IProps) {
   const [arrangements, setArrangements] = useState<IArrangement[]>([]);
 
   useEffect(() => {
     fetchData().then((d) => {
       if (d !== undefined) {
+        d.sort((a,b )=> b.startTime.localeCompare(a.startTime))
         setArrangements(d);
       }
     });
@@ -18,7 +22,7 @@ export default function ArrangementsList() {
   return (
     <ArrangementListWrapper>
       {arrangements.map((arrangement: IArrangement) => {
-        return <Arrangement arrangement={arrangement}/>
+        return <Arrangement key={arrangement.id} arrangement={arrangement} user={props.user}/>
       })}
     </ArrangementListWrapper>
   );

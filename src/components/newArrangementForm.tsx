@@ -1,23 +1,24 @@
 import styled from "styled-components";
-import { addData } from "../firebase/dbUtils";
+import { addData, IArrangement } from "../firebase/dbUtils";
 import { useState } from "react";
+import { UserCredential } from 'firebase/auth';
 
-export const NewArrangementFormModal = () => {
-  const a = {
-    startTime: "New Item",
-    endTime: "end",
-    title: "first event",
-    description: "This is a new item.",
-    createdAt: new Date(),
-  };
 
-  const [formData, setFormData] = useState({
+interface IProps {
+  user: UserCredential
+}
+
+export const NewArrangementFormModal = (props: IProps) => {
+  
+
+  const [formData, setFormData] = useState<IArrangement>({
     id: '',
     startTime: '',
     endTime: '',
     title: '',
     description: '',
     createdAt: new Date(),
+    createdByEmail: props.user.user.email ?? undefined
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
