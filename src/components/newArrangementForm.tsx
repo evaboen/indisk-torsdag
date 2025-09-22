@@ -1,27 +1,26 @@
 import styled from "styled-components";
-import { addData, IArrangement } from "../firebase/dbUtils";
+import { addArrangement, IArrangement } from "../firebase/dbUtils";
 import { useState } from "react";
-import { UserCredential } from 'firebase/auth';
-
+import { UserCredential } from "firebase/auth";
 
 interface IProps {
-  user: UserCredential
+  user: UserCredential;
+  closeModal: () => void;
 }
 
 export const NewArrangementFormModal = (props: IProps) => {
-  
-
   const [formData, setFormData] = useState<IArrangement>({
-    id: '',
-    startTime: '',
-    endTime: '',
-    title: '',
-    description: '',
+    id: "",
+    startTime: "",
+    title: "",
+    description: "",
     createdAt: new Date(),
-    createdByEmail: props.user.user.email ?? undefined
+    createdByEmail: props.user.user.email ?? undefined,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -31,16 +30,16 @@ export const NewArrangementFormModal = (props: IProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    addData( formData);
+    addArrangement(formData);
+    props.closeModal();
     //alert('Arrangement Submitted!');
   };
 
-
   return (
-<FormContainer>
+    <FormContainer>
       <h2>Create Arrangement</h2>
       <form onSubmit={handleSubmit}>
-        <Label htmlFor="startTime">Start Time</Label>
+        <Label htmlFor="startTime">Når?</Label>
         <Input
           type="datetime-local"
           id="startTime"
@@ -49,18 +48,7 @@ export const NewArrangementFormModal = (props: IProps) => {
           onChange={handleChange}
           required
         />
-
-        <Label htmlFor="endTime">End Time</Label>
-        <Input
-          type="datetime-local"
-          id="endTime"
-          name="endTime"
-          value={formData.endTime}
-          onChange={handleChange}
-          required
-        />
-
-        <Label htmlFor="title">Title</Label>
+        <Label htmlFor="title">Tittel</Label>
         <Input
           type="text"
           id="title"
@@ -70,7 +58,7 @@ export const NewArrangementFormModal = (props: IProps) => {
           required
         />
 
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">Beskrivelse...</Label>
         <TextArea
           id="description"
           name="description"
@@ -81,7 +69,7 @@ export const NewArrangementFormModal = (props: IProps) => {
 
         <Button type="submit">Opprett </Button>
       </form>
-    </FormContainer>      
+    </FormContainer>
   );
 };
 

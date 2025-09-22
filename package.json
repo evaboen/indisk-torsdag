@@ -12,6 +12,10 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "firebase": "^11.2.0",
+    "firebase-admin": "^13.5.0",
+    "firebase-functions": "^6.4.0",
+    "moment": "^2.30.1",
+    "nodemailer": "^7.0.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
@@ -25,7 +29,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "kjøh": "yarn build && gh-pages -d dist"
   },
   "eslintConfig": {
     "extends": [
