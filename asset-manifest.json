@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/indisk-torsdag/static/css/main.e6c13ad2.css",
-    "main.js": "/indisk-torsdag/static/js/main.703374dd.js",
+    "main.js": "/indisk-torsdag/static/js/main.2d1c8bdc.js",
     "static/js/453.ef6977ce.chunk.js": "/indisk-torsdag/static/js/453.ef6977ce.chunk.js",
     "index.html": "/indisk-torsdag/index.html",
     "main.e6c13ad2.css.map": "/indisk-torsdag/static/css/main.e6c13ad2.css.map",
-    "main.703374dd.js.map": "/indisk-torsdag/static/js/main.703374dd.js.map",
+    "main.2d1c8bdc.js.map": "/indisk-torsdag/static/js/main.2d1c8bdc.js.map",
     "453.ef6977ce.chunk.js.map": "/indisk-torsdag/static/js/453.ef6977ce.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.703374dd.js"
+    "static/js/main.2d1c8bdc.js"
   ]
 }
