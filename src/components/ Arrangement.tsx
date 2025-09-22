@@ -6,7 +6,6 @@ import {
 } from "../firebase/dbUtils";
 import styled from "styled-components";
 import { UserCredential } from "firebase/auth";
-import { hasFormSubmit } from "@testing-library/user-event/dist/utils";
 import moment from "moment";
 import { Comments } from "./Comments";
 
@@ -25,7 +24,7 @@ export const Arrangement = (props: IArrangementProps) => {
       return;
     }
 
-    return attendArrangement(arrangementId, email);
+    attendArrangement(arrangementId, email);
   };
 
   const handleDelete = () => {
@@ -38,7 +37,7 @@ export const Arrangement = (props: IArrangementProps) => {
   };
 
   const startTime = moment(props.arrangement.startTime).format(
-    "dd.mm.yy hh:mm"
+    "dd.mm.yy HH:mm"
   );
 
   const deleteVisible =

@@ -34,7 +34,7 @@ export const Comments = (props: ICommentProps) => {
       {comments.map((c) => {
         const createdDateRawExists = c.createdAt !== null;
         const createdAt = createdDateRawExists
-          ? moment(c.createdAt.toDate()).format("hh:mm DD.MMM")
+          ? moment(c.createdAt.toDate()).format("HH:mm DD.MMM")
           : "";
         return (
           <Comment key={c.id}>

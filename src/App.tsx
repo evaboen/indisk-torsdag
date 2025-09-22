@@ -5,12 +5,12 @@ import { NewArrangementFormModal } from "./components/newArrangementForm";
 import styled from "styled-components";
 import Auth from "./components/auth";
 import { UserCredential } from "firebase/auth";
+import moment from "moment";
 
 function App() {
   const [newArrangmentOpen, setNewArrangmentOpen] = useState(false);
   const [user, setUser] = useState<UserCredential | undefined>(() => {
     const stored = sessionStorage.getItem("signedInUser");
-    console.log(stored);
     return stored ? JSON.parse(stored) : undefined;
   });
 

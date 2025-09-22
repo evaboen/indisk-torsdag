@@ -63,12 +63,9 @@ export const attendArrangement = async (id: string, email: string) => {
   try {
     const docRef = doc(db, "Arrangements", id);
 
-    // arrayUnion ensures no duplicate emails are added
     await updateDoc(docRef, {
       attendingEmails: arrayUnion(email),
     });
-
-    console.log(`User ${email} added to arrangement ${id}`);
   } catch (error) {
     console.error("Error attending arrangement: ", error);
   }

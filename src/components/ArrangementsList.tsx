@@ -12,15 +12,6 @@ interface IProps {
 export default function ArrangementsList(props: IProps) {
   const [arrangements, setArrangements] = useState<IArrangement[]>([]);
 
-  // useEffect(() => {
-  //   fetchData().then((d) => {
-  //     if (d !== undefined) {
-  //       d.sort((a,b )=> b.startTime.localeCompare(a.startTime))
-  //       setArrangements(d);
-  //     }
-  //   });
-  // }, []);
-
   useEffect(() => {
     const colRef = collection(db, "Arrangements");
 
