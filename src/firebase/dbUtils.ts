@@ -12,6 +12,8 @@ import {
   orderBy,
   onSnapshot,
   Timestamp,
+  setDoc,
+  getDoc,
 } from "firebase/firestore";
 
 import { db } from "./firebase";
@@ -32,6 +34,13 @@ export type IComment = {
   createdAt: Timestamp;
   createdBy: string;
   text: string;
+};
+
+export type IUserProfile = {
+  email: string;
+  nickname?: string;
+  profilePicture?: string;
+  createdAt: Date;
 };
 
 export const fetchData = async () => {
@@ -115,4 +124,48 @@ export const subscribeComments = (
     }));
     callback(comments);
   });
+};
+
+export const createOrUpdateUser = async (
+  email: string,
+  nickname?: string,
+  profilePicture?: string
+) => {
+  try {
+    const userRef = doc(db, "Users", email); // email is the document ID
+
+    await setDoc(
+      userRef,
+      {
+        email,
+        nickname,
+        profilePicture,
+        createdAt: new Date(),
+      },
+      { merge: true } // merge keeps old data when updating
+    );
+
+    console.log(`User ${email} created/updated`);
+  } catch (error) {
+    console.error("Error creating/updating user: ", error);
+  }
+};
+
+export const getUserProfile = async (
+  email: string
+): Promise<IUserProfile | null> => {
+  try {
+    const userRef = doc(db, "Users", email);
+    const snap = await getDoc(userRef);
+
+    if (snap.exists()) {
+      return snap.data() as IUserProfile;
+    } else {
+      console.log("No user found for", email);
+      return null;
+    }
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    return null;
+  }
 };

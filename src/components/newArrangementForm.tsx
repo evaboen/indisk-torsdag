@@ -5,7 +5,6 @@ import { UserCredential } from "firebase/auth";
 
 interface IProps {
   user: UserCredential;
-  closeModal: () => void;
 }
 
 export const NewArrangementFormModal = (props: IProps) => {
@@ -31,7 +30,6 @@ export const NewArrangementFormModal = (props: IProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addArrangement(formData);
-    props.closeModal();
     //alert('Arrangement Submitted!');
   };
 

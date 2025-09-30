@@ -1,21 +1,18 @@
 import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ArrangementsList from "./components/ArrangementsList";
 import { Header } from "./components/Header";
 import { NewArrangementFormModal } from "./components/newArrangementForm";
 import styled from "styled-components";
 import Auth from "./components/auth";
 import { UserCredential } from "firebase/auth";
-import moment from "moment";
+import { Profile } from "./components/Profile";
 
 function App() {
-  const [newArrangmentOpen, setNewArrangmentOpen] = useState(false);
   const [user, setUser] = useState<UserCredential | undefined>(() => {
     const stored = sessionStorage.getItem("signedInUser");
     return stored ? JSON.parse(stored) : undefined;
   });
-
-  const toggleNewArrangementOpen = () =>
-    setNewArrangmentOpen(!newArrangmentOpen);
 
   if (!user) {
     return <Auth setUser={setUser} />;
@@ -23,19 +20,24 @@ function App() {
 
   return (
     <AppWrapper>
-      <Header
-        newArrangmentOpen={newArrangmentOpen}
-        onOpenModal={toggleNewArrangementOpen}
-        setUser={setUser}
-      />
-      {newArrangmentOpen ? (
-        <NewArrangementFormModal
-          user={user}
-          closeModal={() => setNewArrangmentOpen(false)}
+      <Header setUser={setUser} />
+
+      <Routes>
+        <Route path="/" element={<Navigate to="/arrangements" replace />} />
+        <Route
+          path="/arrangements"
+          element={<ArrangementsList user={user} />}
         />
-      ) : (
-        <ArrangementsList user={user} />
-      )}
+        <Route
+          path="/arrangements/new"
+          element={<NewArrangementFormModal user={user} />}
+        />
+        <Route path="/profil" element={<Profile user={user} />} />
+        <Route
+          path="*"
+          element={<h2>404 Noe feil her, hmmm? prøv igjen kanskje?</h2>}
+        />
+      </Routes>
     </AppWrapper>
   );
 }
