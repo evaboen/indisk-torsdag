@@ -3,15 +3,16 @@ import {
   attendArrangement,
   deleteArrangement,
   IArrangement,
+  IUserProfile,
 } from "../firebase/dbUtils";
 import styled from "styled-components";
-import { UserCredential } from "firebase/auth";
 import moment from "moment";
 import { Comments } from "./Comments";
+import { ProfilePictureAndName } from "./PrfilePictreAndName";
 
 type IArrangementProps = {
   arrangement: IArrangement;
-  user: UserCredential;
+  user: IUserProfile;
 };
 
 export const Arrangement = (props: IArrangementProps) => {
@@ -19,7 +20,7 @@ export const Arrangement = (props: IArrangementProps) => {
 
   const handleAttend = () => {
     const arrangementId = props.arrangement.id;
-    const email = props.user.user.email;
+    const email = props.user.email;
     if (!arrangementId || !email) {
       return;
     }
@@ -37,49 +38,82 @@ export const Arrangement = (props: IArrangementProps) => {
   };
 
   const startTime = moment(props.arrangement.startTime).format(
-    "dd.mm.yy HH:mm"
+    "dddd DD.MMM HH:mm"
   );
 
   const deleteVisible =
-    props.user.user.email === "erlendvaboen@gmail.com" ||
-    props.user.user.email === props.arrangement.createdByEmail;
+    props.user.email === "erlendvaboen@gmail.com" ||
+    props.user.email === props.arrangement.createdByEmail;
 
   const Confirmation = () => {
     if (deleteModalOpen) {
       return (
         <div>
-          <button onClick={handleDelete}>ja slett den</button>
-          <button onClick={() => setDeleteModalOpen(false)}>
+          <DeleteButton onClick={handleDelete}>ja slett den</DeleteButton>
+          <DeleteButton onClick={() => setDeleteModalOpen(false)}>
             nei, ombestemt meg
-          </button>
+          </DeleteButton>
         </div>
       );
     }
     return (
       <div>
-        <button onClick={() => setDeleteModalOpen(true)}>slett den!</button>
+        <DeleteButton onClick={() => setDeleteModalOpen(true)}>
+          slett den!
+        </DeleteButton>
       </div>
     );
   };
 
+  const attendingCount = props.arrangement.attendingEmails?.length ?? 0;
+
   return (
     <ArrangementCard>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>{props.arrangement.title}</h2> {deleteVisible && <Confirmation />}
-      </div>
-      <p>Når?: {startTime}</p>
-      <p>Hva skjer?: {props.arrangement.description}</p>
-      <p>laget av: {props.arrangement.createdByEmail}</p>
-      <p>meldt på: {props.arrangement.attendingEmails?.join(", ")}</p>
-      <button onClick={handleAttend}>meld deg på</button>
+      <TitleDiv>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <h2>{props.arrangement.title}</h2> <p>{startTime}</p>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <ProfilePictureAndName email={props.arrangement.createdByEmail} />
+          {deleteVisible && <Confirmation />}
+        </div>
+      </TitleDiv>
+
+      <p>{props.arrangement.description}</p>
+      <b>
+        {attendingCount > 0
+          ? `meldt på (${attendingCount}):`
+          : "...ingen påmeldte :("}
+      </b>
+      {props.arrangement.attendingEmails?.map((email) => (
+        <ProfilePictureAndName notBold imageSize={30} email={email} />
+      ))}
+      <AttendButton onClick={handleAttend}>meld deg på</AttendButton>
       <Comments user={props.user} arrangement={props.arrangement} />
     </ArrangementCard>
   );
 };
 
 const ArrangementCard = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
   background-color: yellow;
   margin: 10px;
   padding: 10px;
+`;
+
+const TitleDiv = styled.div`
+  width: 100%;
+  border-color: red;
+  border-bottom: 1px;
+`;
+const AttendButton = styled.button`
+  width: 120px;
+  background: rgb(9, 230, 20);
+`;
+const DeleteButton = styled.button`
+  width: 120px;
+  background: rgb(201, 17, 137);
+  color: white;
 `;

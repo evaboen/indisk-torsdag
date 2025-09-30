@@ -5,14 +5,19 @@ import { Header } from "./components/Header";
 import { NewArrangementFormModal } from "./components/newArrangementForm";
 import styled from "styled-components";
 import Auth from "./components/auth";
-import { UserCredential } from "firebase/auth";
 import { Profile } from "./components/Profile";
+import { IUserProfile } from "./firebase/dbUtils";
 
 function App() {
-  const [user, setUser] = useState<UserCredential | undefined>(() => {
-    const stored = sessionStorage.getItem("signedInUser");
+  const [user, setUser] = useState<IUserProfile | undefined>(() => {
+    const stored = localStorage.getItem("signedInUser");
     return stored ? JSON.parse(stored) : undefined;
   });
+
+  const handleUserUpdate = (user: IUserProfile | undefined) => {
+    localStorage.setItem("signedInUser", JSON.stringify(user));
+    setUser(user);
+  };
 
   if (!user) {
     return <Auth setUser={setUser} />;
@@ -32,7 +37,10 @@ function App() {
           path="/arrangements/new"
           element={<NewArrangementFormModal user={user} />}
         />
-        <Route path="/profil" element={<Profile user={user} />} />
+        <Route
+          path="/profil"
+          element={<Profile user={user} onProfileUpdated={handleUserUpdate} />}
+        />
         <Route
           path="*"
           element={<h2>404 Noe feil her, hmmm? prøv igjen kanskje?</h2>}

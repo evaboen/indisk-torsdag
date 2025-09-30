@@ -24,7 +24,7 @@ export type IArrangement = {
   title: string;
   description: string;
   createdAt: Date;
-  createdByEmail?: string;
+  createdByEmail: string;
   attendingEmails?: string[];
 };
 
@@ -167,5 +167,30 @@ export const getUserProfile = async (
   } catch (err) {
     console.error("Error fetching user:", err);
     return null;
+  }
+};
+
+export const createUserIfNotExists = async (
+  email: string,
+  nickname?: string,
+  profilePicture?: string
+) => {
+  try {
+    const userRef = doc(db, "Users", email);
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) {
+      await setDoc(userRef, {
+        email,
+        nickname,
+        profilePicture,
+        createdAt: new Date(),
+      });
+      console.log(`User ${email} created`);
+    } else {
+      console.log(`User ${email} already exists`);
+    }
+  } catch (error) {
+    console.error("Error creating user: ", error);
   }
 };

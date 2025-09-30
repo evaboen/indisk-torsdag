@@ -1,22 +1,34 @@
-// src/components/Auth.tsx
-
-import React, { useState } from "react";
 import { signInWithGoogle } from "../firebase/auth";
-import { UserCredential } from "firebase/auth";
 import styled from "styled-components";
+import {
+  createUserIfNotExists,
+  getUserProfile,
+  IUserProfile,
+} from "../firebase/dbUtils";
 
 interface IProps {
-  setUser: (user: UserCredential | undefined) => void;
+  setUser: (user: IUserProfile | undefined) => void;
 }
 
 const Auth = (props: IProps) => {
   const handleGoogleSignIn = async () => {
     try {
       const user = await signInWithGoogle();
-      props.setUser(user);
-      sessionStorage.setItem("signedInUser", JSON.stringify(user));
+      const email = user.user.email;
+      if (email) {
+        // Only create if not exists
+        await createUserIfNotExists(
+          email,
+          user.user.displayName ?? "",
+          user.user.photoURL ?? ""
+        );
 
-      console.log("User signed in with Google:", user);
+        // Fetch profile if you want to use it immediately
+        const profile = await getUserProfile(email);
+        if (profile) {
+          props.setUser(profile);
+        }
+      }
     } catch (error) {
       console.error("Google sign in error:", error);
     }

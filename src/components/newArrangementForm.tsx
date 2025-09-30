@@ -1,20 +1,25 @@
 import styled from "styled-components";
-import { addArrangement, IArrangement } from "../firebase/dbUtils";
+import {
+  addArrangement,
+  IArrangement,
+  IUserProfile,
+} from "../firebase/dbUtils";
 import { useState } from "react";
-import { UserCredential } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 interface IProps {
-  user: UserCredential;
+  user: IUserProfile;
 }
 
 export const NewArrangementFormModal = (props: IProps) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<IArrangement>({
     id: "",
     startTime: "",
     title: "",
     description: "",
     createdAt: new Date(),
-    createdByEmail: props.user.user.email ?? undefined,
+    createdByEmail: props.user.email ?? undefined,
   });
 
   const handleChange = (
@@ -30,6 +35,7 @@ export const NewArrangementFormModal = (props: IProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addArrangement(formData);
+    navigate("/arrangements");
     //alert('Arrangement Submitted!');
   };
 
@@ -76,9 +82,7 @@ const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 20px;
-  overflowHidden
 `;
-
 const Label = styled.label`
   margin-bottom: 8px;
   font-weight: bold;

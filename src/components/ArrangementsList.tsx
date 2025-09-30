@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { fetchData, IArrangement } from "../firebase/dbUtils";
+import { IArrangement, IUserProfile } from "../firebase/dbUtils";
 import { Arrangement } from "./ Arrangement";
 import styled from "styled-components";
-import { UserCredential } from "firebase/auth";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 
 interface IProps {
-  user: UserCredential;
+  user: IUserProfile;
 }
 export default function ArrangementsList(props: IProps) {
   const [arrangements, setArrangements] = useState<IArrangement[]>([]);

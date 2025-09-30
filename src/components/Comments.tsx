@@ -1,17 +1,18 @@
-import { UserCredential } from "firebase/auth";
 import { useEffect, useState } from "react";
 import {
   addComment,
   IArrangement,
   IComment,
+  IUserProfile,
   subscribeComments,
 } from "../firebase/dbUtils";
 import styled from "styled-components";
 import moment from "moment";
+import { ProfilePictureAndName } from "./PrfilePictreAndName";
 
 type ICommentProps = {
   arrangement: IArrangement;
-  user: UserCredential;
+  user: IUserProfile;
 };
 export const Comments = (props: ICommentProps) => {
   const { arrangement, user } = props;
@@ -25,7 +26,7 @@ export const Comments = (props: ICommentProps) => {
 
   const handleSubmit = async () => {
     if (!text) return;
-    await addComment(arrangement.id!, text, user.user.email!);
+    await addComment(arrangement.id!, text, user.email!);
     setText("");
   };
 
@@ -38,8 +39,17 @@ export const Comments = (props: ICommentProps) => {
           : "";
         return (
           <Comment key={c.id}>
-            <b>{c.createdBy}</b>
-            <i> {createdAt}</i>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <ProfilePictureAndName email={c.createdBy} />
+              {/* <b>{c.createdBy}</b> */}
+              <i> {createdAt}</i>
+            </div>
             <p>{c.text}</p>
           </Comment>
         );
