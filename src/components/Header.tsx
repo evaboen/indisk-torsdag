@@ -19,7 +19,7 @@ export function Header({ setUser }: IHeaderProps) {
 
   return (
     <HeaderLine>
-      <h1>INDISKTORSDAG</h1>{" "}
+      <h1>INDISKTORSDAG</h1>
       <button onClick={() => navigate("/arrangements")}>arrangemanter</button>
       <button onClick={() => navigate("/arrangements/new")}>Ny Torsdag?</button>
       <button

@@ -50,3 +50,6 @@ out/
 
 # Coverage
 coverage/
+
+# Local Netlify folder
+.netlify
