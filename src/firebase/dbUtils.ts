@@ -41,6 +41,7 @@ export type IUserProfile = {
   nickname?: string;
   profilePicture?: string;
   createdAt: Date;
+  fcmTokens?: string[];
 };
 
 export const fetchData = async () => {

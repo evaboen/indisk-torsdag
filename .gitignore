@@ -53,3 +53,8 @@ coverage/
 
 # Local Netlify folder
 .netlify
+
+# Firebase CLI
+firebase-debug.log
+firebase-debug.*.log
+.runtimeconfig.json
