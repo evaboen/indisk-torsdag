@@ -35,23 +35,6 @@ export const NewArrangementFormModal = (props: IProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await addArrangement(formData);
-
-    try {
-      const response = await fetch("./.netlify/functions/sendEmail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: "erlendvaboen@gmail.com",
-          subject: "subject",
-          message: "message",
-        }),
-      });
-
-      const result = await response.json();
-      console.log("Email response:", result);
-    } catch (err) {
-      console.error("Error sending email:", err);
-    }
     navigate("/arrangements");
   };
 
