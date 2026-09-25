@@ -7,6 +7,7 @@ import styled from "styled-components";
 import Auth from "./components/auth";
 import { Profile } from "./components/Profile";
 import { IUserProfile } from "./firebase/dbUtils";
+import { NotificationPrompt } from "./components/NotificationPrompt";
 
 function App() {
   const [user, setUser] = useState<IUserProfile | undefined>(() => {
@@ -26,6 +27,7 @@ function App() {
   return (
     <AppWrapper>
       <Header setUser={setUser} />
+      <NotificationPrompt user={user} />
 
       <Routes>
         <Route path="/" element={<Navigate to="/arrangements" replace />} />
