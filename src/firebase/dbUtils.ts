@@ -4,6 +4,7 @@ import {
   addDoc,
   updateDoc,
   arrayUnion,
+  arrayRemove,
   doc,
   deleteDoc,
   serverTimestamp,
@@ -26,6 +27,7 @@ export type IArrangement = {
   createdAt: Date;
   createdByEmail: string;
   attendingEmails?: string[];
+  notAttendingEmails?: string[];
 };
 
 export type IComment = {
@@ -74,10 +76,34 @@ export const attendArrangement = async (id: string, email: string) => {
     const docRef = doc(db, "Arrangements", id);
 
     await updateDoc(docRef, {
+      // Add to attending
       attendingEmails: arrayUnion(email),
+
+      // Remove from not attending
+      notAttendingEmails: arrayRemove(email),
     });
+
+    console.log(`${email} is attending arrangement ${id}`);
   } catch (error) {
     console.error("Error attending arrangement: ", error);
+  }
+};
+
+export const notAttendArrangement = async (id: string, email: string) => {
+  try {
+    const docRef = doc(db, "Arrangements", id);
+
+    await updateDoc(docRef, {
+      // Remove from attending
+      attendingEmails: arrayRemove(email),
+
+      // Add to not attending
+      notAttendingEmails: arrayUnion(email),
+    });
+
+    console.log(`${email} is not attending arrangement ${id}`);
+  } catch (error) {
+    console.error("Error setting not attending arrangement: ", error);
   }
 };
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   attendArrangement,
+  notAttendArrangement,
   deleteArrangement,
   IArrangement,
   IUserProfile,
@@ -9,6 +10,7 @@ import styled from "styled-components";
 import moment from "moment";
 import { Comments } from "./Comments";
 import { ProfilePictureAndName } from "./PrfilePictreAndName";
+import { AttendingList } from "./AtendingList";
 
 type IArrangementProps = {
   arrangement: IArrangement;
@@ -24,8 +26,15 @@ export const Arrangement = (props: IArrangementProps) => {
     if (!arrangementId || !email) {
       return;
     }
-
     attendArrangement(arrangementId, email);
+  };
+  const handleNotAttend = () => {
+    const arrangementId = props.arrangement.id;
+    const email = props.user.email;
+    if (!arrangementId || !email) {
+      return;
+    }
+    notAttendArrangement(arrangementId, email);
   };
 
   const handleDelete = () => {
@@ -40,6 +49,14 @@ export const Arrangement = (props: IArrangementProps) => {
   const startTime = moment(props.arrangement.startTime).format(
     "dddd DD.MMM HH:mm"
   );
+
+  const isAttending = props.arrangement.attendingEmails?.includes(
+    props.user.email
+  );
+  const isNotAttending = props.arrangement.notAttendingEmails?.includes(
+    props.user.email
+  );
+  const isUnansward = !isAttending && !isNotAttending;
 
   const deleteVisible =
     props.user.email === "erlendvaboen@gmail.com" ||
@@ -80,15 +97,26 @@ export const Arrangement = (props: IArrangementProps) => {
       </TitleDiv>
 
       <p>{props.arrangement.description}</p>
-      <b>
-        {attendingCount > 0
-          ? `meldt på (${attendingCount}):`
-          : "...ingen påmeldte :("}
-      </b>
-      {props.arrangement.attendingEmails?.map((email) => (
-        <ProfilePictureAndName notBold imageSize={30} email={email} />
-      ))}
-      <AttendButton onClick={handleAttend}>meld deg på</AttendButton>
+      <div style={{ display: "flex" }}>
+        <AttendingList
+          header="På meldt"
+          emails={props.arrangement.attendingEmails}
+        />
+        <AttendingList
+          header="meldt av"
+          emails={props.arrangement.notAttendingEmails}
+        />
+      </div>
+      <div style={{ display: "flex" }}>
+        {(isNotAttending || isUnansward) && (
+          <AttendButton onClick={handleAttend}>meld deg på</AttendButton>
+        )}
+        {(isAttending || isUnansward) && (
+          <NotAttendButton onClick={handleNotAttend}>
+            Dette vil jeg IKKE på!
+          </NotAttendButton>
+        )}
+      </div>
       <Comments user={props.user} arrangement={props.arrangement} />
     </ArrangementCard>
   );
@@ -111,6 +139,10 @@ const TitleDiv = styled.div`
 const AttendButton = styled.button`
   width: 120px;
   background: rgb(9, 230, 20);
+`;
+const NotAttendButton = styled.button`
+  width: 120px;
+  background: rgb(136, 38, 38);
 `;
 const DeleteButton = styled.button`
   width: 120px;
