@@ -20,7 +20,7 @@ import {
 import { db } from "./firebase";
 
 export type IArrangement = {
-  id?: string;
+  id: string;
   startTime: string;
   title: string;
   description: string;
@@ -28,6 +28,7 @@ export type IArrangement = {
   createdByEmail: string;
   attendingEmails?: string[];
   notAttendingEmails?: string[];
+  guestList?: string[];
 };
 
 export type IComment = {
@@ -46,7 +47,7 @@ export type IUserProfile = {
   fcmTokens?: string[];
 };
 
-export const fetchData = async () => {
+export const fetchData2 = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, "Arrangements"));
     const data = querySnapshot.docs.map((doc) => ({
@@ -59,6 +60,33 @@ export const fetchData = async () => {
     console.error("Error fetching data: ", error);
   }
 };
+export const fetchData = async (userEmail: string) => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "Arrangements"));
+
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as IArrangement[];
+
+    const filteredArrangements = data.filter((arrangement) => {
+      const guestList = arrangement.guestList ?? [];
+      console.log(arrangement);
+      if (guestList.length === 0) return true;
+      return (
+        arrangement.createdByEmail === userEmail ||
+        (arrangement.guestList ?? []).includes(userEmail)
+      );
+    });
+    return filteredArrangements.sort(
+      (a, b) =>
+        new Date(b.startTime).getTime() - new Date(a.startTime).getTime(),
+    );
+  } catch (error) {
+    console.error("Error fetching data: ", error);
+    return [];
+  }
+};
 
 export const addArrangement = async (arrangement: IArrangement) => {
   try {
@@ -68,6 +96,20 @@ export const addArrangement = async (arrangement: IArrangement) => {
     await updateDoc(docRef, { id: docRef.id });
   } catch (error) {
     console.error("Error adding document: ", error);
+  }
+};
+
+export const updateArrangement = async (
+  arrangementId: string,
+  data: Partial<IArrangement>,
+) => {
+  try {
+    const { id, ...updateData } = data;
+
+    await updateDoc(doc(db, "Arrangements", arrangementId), updateData);
+  } catch (error) {
+    console.error("Error updating arrangement:", error);
+    throw error;
   }
 };
 
@@ -120,7 +162,7 @@ export const deleteArrangement = async (id: string) => {
 export const addComment = async (
   arrangementId: string,
   text: string,
-  createdBy: string
+  createdBy: string,
 ) => {
   try {
     await addDoc(collection(db, "comments"), {
@@ -136,12 +178,12 @@ export const addComment = async (
 
 export const subscribeComments = (
   arrangementId: string,
-  callback: (comments: any[]) => void
+  callback: (comments: any[]) => void,
 ) => {
   const q = query(
     collection(db, "comments"),
     where("arrangementId", "==", arrangementId),
-    orderBy("createdAt", "asc")
+    orderBy("createdAt", "asc"),
   );
 
   return onSnapshot(q, (snapshot) => {
@@ -156,7 +198,7 @@ export const subscribeComments = (
 export const createOrUpdateUser = async (
   email: string,
   nickname?: string,
-  profilePicture?: string
+  profilePicture?: string,
 ) => {
   try {
     const userRef = doc(db, "Users", email); // email is the document ID
@@ -169,7 +211,7 @@ export const createOrUpdateUser = async (
         profilePicture,
         createdAt: new Date(),
       },
-      { merge: true } // merge keeps old data when updating
+      { merge: true }, // merge keeps old data when updating
     );
 
     console.log(`User ${email} created/updated`);
@@ -179,7 +221,7 @@ export const createOrUpdateUser = async (
 };
 
 export const getUserProfile = async (
-  email: string
+  email: string,
 ): Promise<IUserProfile | null> => {
   try {
     const userRef = doc(db, "Users", email);
@@ -197,10 +239,23 @@ export const getUserProfile = async (
   }
 };
 
+export const getAllUsers = async (): Promise<IUserProfile[]> => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "Users"));
+
+    return querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+    })) as IUserProfile[];
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+};
+
 export const createUserIfNotExists = async (
   email: string,
   nickname?: string,
-  profilePicture?: string
+  profilePicture?: string,
 ) => {
   try {
     const userRef = doc(db, "Users", email);

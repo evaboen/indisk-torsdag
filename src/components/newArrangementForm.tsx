@@ -1,31 +1,63 @@
 import styled from "styled-components";
 import {
   addArrangement,
+  getAllUsers,
   IArrangement,
   IUserProfile,
+  updateArrangement,
 } from "../firebase/dbUtils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface IProps {
   user: IUserProfile;
+  arrangement?: IArrangement; // Omit when creating
 }
 
 export const NewArrangementFormModal = (props: IProps) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<IArrangement>({
-    id: "",
-    startTime: "",
-    title: "",
-    description: "",
-    createdAt: new Date(),
-    createdByEmail: props.user.email ?? undefined,
-  });
+  const [formData, setFormData] = useState<IArrangement>(
+    props.arrangement ?? {
+      id: "",
+      startTime: "",
+      title: "",
+      description: "",
+      createdAt: new Date(),
+      createdByEmail: props.user.email ?? undefined,
+      guestList: [],
+    },
+  );
+  const [users, setUsers] = useState<IUserProfile[]>([]);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      const allUsers = await getAllUsers();
+      setUsers(allUsers);
+    };
+
+    loadUsers();
+  }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
+
+    if (e.target instanceof HTMLSelectElement && e.target.multiple) {
+      const selectedValues = Array.from(
+        e.target.selectedOptions,
+        (option) => option.value,
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: selectedValues,
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -34,13 +66,19 @@ export const NewArrangementFormModal = (props: IProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await addArrangement(formData);
+
+    if (props.arrangement) {
+      await updateArrangement(props.arrangement.id, formData);
+    } else {
+      await addArrangement(formData);
+    }
+
     navigate("/arrangements");
   };
 
   return (
     <FormContainer>
-      <h2>Create Arrangement</h2>
+      <h2>{props.arrangement ? "Endre på ditta!" : "Lag splitter ny!"}</h2>{" "}
       <form onSubmit={handleSubmit}>
         <Label htmlFor="startTime">Når?</Label>
         <Input
@@ -60,7 +98,6 @@ export const NewArrangementFormModal = (props: IProps) => {
           onChange={handleChange}
           required
         />
-
         <Label htmlFor="description">Beskrivelse...</Label>
         <TextArea
           id="description"
@@ -69,8 +106,33 @@ export const NewArrangementFormModal = (props: IProps) => {
           value={formData.description}
           onChange={handleChange}
         />
-
-        <Button type="submit">Opprett </Button>
+        <Label>Hmm Hvemm får komme?</Label>
+        <UserList>
+          {users
+            .filter((u) => u.email && u.email !== props.user.email)
+            .map((u) => (
+              <CheckboxLabel key={u.email}>
+                <input
+                  type="checkbox"
+                  checked={(formData.guestList ?? []).includes(u.email)}
+                  onChange={(e) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      guestList: e.target.checked
+                        ? [...(prev.guestList ?? []), u.email]
+                        : (prev.guestList ?? []).filter(
+                            (email) => email !== u.email,
+                          ),
+                    }));
+                  }}
+                />
+                {u.nickname || u.email}
+              </CheckboxLabel>
+            ))}
+        </UserList>
+        <Button type="submit">
+          {props.arrangement ? "Lagr endring" : "Lounge dette eventet!!!!"}
+        </Button>{" "}
       </form>
     </FormContainer>
   );
@@ -113,5 +175,28 @@ const Button = styled.button`
 
   &:hover {
     background-color: #0056b3;
+  }
+`;
+
+const UserList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  input {
+    cursor: pointer;
   }
 `;

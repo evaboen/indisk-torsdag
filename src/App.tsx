@@ -8,6 +8,7 @@ import Auth from "./components/auth";
 import { Profile } from "./components/Profile";
 import { IUserProfile } from "./firebase/dbUtils";
 import { NotificationPrompt } from "./components/NotificationPrompt";
+import { EditArrangementPage } from "./components/EditArrangementPage";
 
 function App() {
   const [user, setUser] = useState<IUserProfile | undefined>(() => {
@@ -38,6 +39,10 @@ function App() {
         <Route
           path="/arrangements/new"
           element={<NewArrangementFormModal user={user} />}
+        />
+        <Route
+          path="/arrangements/:id/edit"
+          element={<EditArrangementPage user={user} />}
         />
         <Route
           path="/profil"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IArrangement, IUserProfile } from "../firebase/dbUtils";
+import { fetchData, IArrangement, IUserProfile } from "../firebase/dbUtils";
 import { Arrangement } from "./ Arrangement";
 import styled from "styled-components";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -12,16 +12,13 @@ export default function ArrangementsList(props: IProps) {
   const [arrangements, setArrangements] = useState<IArrangement[]>([]);
 
   useEffect(() => {
-    const colRef = collection(db, "Arrangements");
-
-    const unsubscribe = onSnapshot(colRef, (snapshot) => {
-      const data = snapshot.docs.map((doc) => doc.data() as IArrangement);
-      data.sort((a, b) => b.startTime.localeCompare(a.startTime));
+    const loadArrangements = async () => {
+      const data = await fetchData(props.user.email);
       setArrangements(data);
-    });
+    };
 
-    return () => unsubscribe(); // cleanup on unmount
-  }, []);
+    loadArrangements();
+  }, [props.user.email]);
 
   return (
     <ArrangementListWrapper>

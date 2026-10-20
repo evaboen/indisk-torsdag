@@ -11,6 +11,7 @@ import moment from "moment";
 import { Comments } from "./Comments";
 import { ProfilePictureAndName } from "./PrfilePictreAndName";
 import { AttendingList } from "./AtendingList";
+import { useNavigate } from "react-router-dom";
 
 type IArrangementProps = {
   arrangement: IArrangement;
@@ -19,6 +20,7 @@ type IArrangementProps = {
 
 export const Arrangement = (props: IArrangementProps) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleAttend = () => {
     const arrangementId = props.arrangement.id;
@@ -47,18 +49,18 @@ export const Arrangement = (props: IArrangementProps) => {
   };
 
   const startTime = moment(props.arrangement.startTime).format(
-    "dddd DD.MMM HH:mm"
+    "dddd DD.MMM HH:mm",
   );
 
   const isAttending = props.arrangement.attendingEmails?.includes(
-    props.user.email
+    props.user.email,
   );
   const isNotAttending = props.arrangement.notAttendingEmails?.includes(
-    props.user.email
+    props.user.email,
   );
   const isUnansward = !isAttending && !isNotAttending;
 
-  const deleteVisible =
+  const arrangementOwner =
     props.user.email === "erlendvaboen@gmail.com" ||
     props.user.email === props.arrangement.createdByEmail;
 
@@ -92,7 +94,20 @@ export const Arrangement = (props: IArrangementProps) => {
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <ProfilePictureAndName email={props.arrangement.createdByEmail} />
-          {deleteVisible && <Confirmation />}
+          {arrangementOwner && (
+            <ActionsDiv>
+              <EditButton
+                onClick={() =>
+                  navigate(`/arrangements/${props.arrangement.id}/edit`, {
+                    state: { arrangement: props.arrangement },
+                  })
+                }
+              >
+                Rediger
+              </EditButton>
+              <Confirmation />
+            </ActionsDiv>
+          )}
         </div>
       </TitleDiv>
 
@@ -148,4 +163,16 @@ const DeleteButton = styled.button`
   width: 120px;
   background: rgb(201, 17, 137);
   color: white;
+`;
+const EditButton = styled.button`
+  width: 120px;
+  background: rgb(232, 207, 232);
+  color: white;
+`;
+const ActionsDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+  border-color: red;
+  border-bottom: 1px;
 `;
